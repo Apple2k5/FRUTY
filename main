@@ -1,0 +1,44 @@
+from flask import Flask, jsonify, render_template_string, url_for
+from flask_cors import CORS
+import os
+
+app = Flask(_name_, static_folder='static')
+CORS(app)
+
+@app.route('/')
+def home():
+    with open('frontend.html', 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    return render_template_string(html_content)
+
+@app.route('/check_pests')
+def check_pests():
+    return jsonify({
+        "pest": "white flies",
+        "image": "/static/white flies.jpg",
+        "fertilizer": "Neem Cake, Vermicompost"
+    })
+
+@app.route('/robot_view')
+def robot_view():
+    return jsonify({
+        "video": "/static/robot_view.mp4"
+    })
+
+if _name_ == "_main_":
+    app.run(debug=True, host='0.0.0.0')
+##part 2
+import cv2
+
+# Replace this link with your camera's image URL
+image_url = 'http://192.168.1.101:8080/shot.jpg'  # Example; update to your actual webcam link
+
+cap = cv2.VideoCapture(image_url)
+ret, frame = cap.read()
+cap.release()
+
+if ret:
+    cv2.imwrite('captured_image.jpg', frame)
+    print("Image saved as captured_image.jpg!")
+else:
+    print("Could not capture image. Check camera URL and WiFi.")
