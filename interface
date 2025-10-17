@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FRUTY — Farmer App with Multi-language Audio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <style>
+    /* Styles unchanged from your provided code */
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f6fef6;
+      color: #1b2a1f;
+    }
+
+    .app {
+      max-width: 1000px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 20px;
+      color: #27ae60;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .lang-connect {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #connectBtn {
+      padding: 10px 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background: #27ae60;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #lang-select {
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      min-width: 110px;
+      user-select: none;
+    }
+
+    main {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+      margin-bottom: 12px;
+      user-select: none;
+    }
+
+    .live-view {
+      width: 100%;
+      height: 330px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 3px solid #eafaf1;
+      background: #eafaf1;
+      display: block;
+      margin: auto;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-block {
+      background: #f0fdf4;
+      padding: 10px 14px;
+      border-radius: 10px;
+      min-width: 100px;
+      flex: 1 1 120px;
+      text-align: center;
+      color: #1b2a1f;
+    }
+
+    .status-block .title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 6px;
+      user-select: none;
+    }
+
+    .status-block .value {
+      font-weight: 700;
+      font-size: 20px;
+      color: #27ae60;
+      user-select: none;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .action-btn {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #1b2a1f;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s;
+    }
+
+    .action-btn:hover {
+      background: #ecf1ec;
+    }
+
+    .alert {
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      cursor: default;
+    }
+
+    .alert.red {
+      background-color: #c0392b;
+      animation: blink-red 1.5s infinite;
+    }
+
+    @keyframes blink-red {
+      0%,
+      100% {
+        filter: brightness(1);
+      }
+
+      50% {
+        filter: brightness(0.6);
+      }
+    }
+
+    .alert.yellow {
+      background-color: #f39c12;
+      animation: blink-yellow 2s infinite alternate;
+      color: #000;
+    }
+
+    @keyframes blink-yellow {
+      0% {
+        background-color: #f39c12;
+      }
+
+      100% {
+        background-color: #fff3bf;
+      }
+    }
+
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+      user-select: none;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app" role="application">
+    <header>
+      <div class="logo" id="appName" tabindex="0">🌱 FRUTY App</div>
+      <div class="lang-connect">
+        <button id="connectBtn" tabindex="0">🔗 Connect Device</button>
+        <select id="lang-select" aria-label="Select Language" tabindex="0">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="mr">Marathi</option>
+          <option value="bn">Bengali</option>
+          <option value="te">Telugu</option>
+        </select>
+      </div>
+    </header>
+    <main>
+      <section>
+        <div class="card" id="robotView" tabindex="0" role="button" aria-label="Field Robot View">
+          <h3 id="liveViewTitle">🤖 Field Robot View</h3>
+          <img src="http://192.168.0.186:8080/video" style="width:100%;height:330px;border-radius:12px;">
+          <div id="robot-location">📍 North Plot</div>
+        </div>
+        <div class="card" id="fieldStatus" tabindex="0" role="button" aria-label="Field Status">
+          <h3 id="fieldStatusTitle">🌾 Field Status</h3>
+          <div class="status-row">
+            <div class="status-block">
+              <div class="title" id="pestsTitle">🌿 Pests</div>
+              <div class="value" id="pestsValue">None</div>
+            </div>
+            <div class="status-block">
+              <div class="title" id="moistureTitle">💧 Moisture</div>
+              <div class="value" id="moistureValue">62%</div>
+            </div>
+            <div class="status-block">
+              <div class="title" id="phTitle">⚗ PH</div>
+              <div class="value" id="phValue">6.4</div>
+            </div>
+            <div class="status-block">
+              <div class="title" id="nutrientsTitle">🌱 Nutrients</div>
+              <div class="value" id="nutrientsValue">Good</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="cropSuggestions" tabindex="0" role="button" aria-label="Crop Suggestions">
+          <h3 id="cropSugTitle">🌾 Crop Suggestions</h3>
+          <p id="cropSugText">Recommended: Maize, Wheat, and Barley</p>
+        </div>
+        <div class="card" id="chargingInfo" tabindex="0" role="button" aria-label="Charging Status">
+          <h3 id="chargingTitle">🔋 FRUTY Charging Status</h3>
+          <p id="chargingStatus">Battery at 75%, charging</p>
+        </div>
+        <div class="card" id="actionsGroup" role="group" aria-label="Farmer Actions">
+          <h3 id="actionsTitle">⚡ Actions</h3>
+          <button class="action-btn" id="checkPestsBtn" tabindex="0" aria-label="Check Pests">🐛 Check Pests</button>
+          <button class="action-btn" id="removeWeedsBtn" tabindex="0" aria-label="Remove Weeds">🌿 Remove Weeds</button>
+          <button class="action-btn" id="testSoilBtn" tabindex="0" aria-label="Test Soil">🧪 Test Soil</button>
+          <button class="action-btn" id="irrigateBtn" tabindex="0" aria-label="Irrigate">🚰 Irrigate</button>
+        </div>
+      </section>
+      <aside>
+        <div class="card" aria-label="Alerts and Suggestions">
+          <h3 id="alertsTitle">🚨 Alerts</h3>
+          <div id="snakeAlert" class="alert red blink" tabindex="0" aria-live="assertive" aria-atomic="true" role="alert">
+            🐍 Snake detected — North Plot
+          </div>
+          <div id="weedsAlert" class="alert yellow blink" tabindex="0" aria-live="polite" role="alert">
+            🌿 High weed growth — Field B
+          </div>
+          <h3 id="suggestionsTitle">🌱 Suggestions</h3>
+          <p id="phAdvice">Soil PH 6.4 — Apply Potassium Fertilizer</p>
+        </div>
+      </aside>
+    </main>
+    <footer tabindex="0">FRUTY Farmers App • Demo</footer>
+
+    <script>
+      // Add event listener for Check Pests button
+      document.addEventListener('DOMContentLoaded', function() {
+        const checkPestsBtn = document.getElementById('checkPestsBtn');
+        
+        checkPestsBtn.addEventListener('click', async function() {
+          try {
+            const response = await fetch('/check_pests');
+            const data = await response.json();
+            
+            // Update the pests value in the UI
+            document.getElementById('pestsValue').textContent = data.pest;
+            
+            // Optional: Show success message
+            console.log('Pest check completed:', data);
+          } catch (error) {
+            console.error('Error checking pests:', error);
+            document.getElementById('pestsValue').textContent = 'Error';
+          }
+        });
+      });
+
+      const translations = {
+        en: {
+          appName: "🌱 FRUTY App",
+          connectBtn: "🔗 Connect Device",
+          liveViewTitle: "🤖 Field Robot View",
+          robotLocation: "📍 North Plot",
+          fieldStatusTitle: "🌾 Field Status",
+          pestsTitle: "🌿 Pests",
+          moistureTitle: "💧 Moisture",
+          phTitle: "⚗ PH",
+          nutrientsTitle: "🌱 Nutrients",
+          pestsValue: "None",
+          nutrientsValue: "Good",
+          cropSugTitle: "🌾 Crop Suggestions",
+          cropSugText: "Recommended: Maize, Wheat, and Barley",
+          chargingTitle: "🔋 FRUTY Charging Status",
+          chargingStatus: "Battery at 75%, charging",
+          actionsTitle: "⚡ Actions",
+          checkPestsBtn: "🐛 Check Pests",
+          removeWeedsBtn: "🌿 Remove Weeds",
+          testSoilBtn: "🧪 Test Soil",
+          irrigateBtn: "🚰 Irrigate",
+          alertsTitle: "🚨 Alerts",
+          snakeAlert: "🐍 Snake detected — North Plot",
+          weedsAlert: "🌿 High weed growth — Field B",
+          suggestionsTitle: "🌱 Suggestions",
+          phAdvice: "Soil PH 6.4 — Apply Potassium Fertilizer",
+          footer: "FRUTY Farmers App • Demo"
+        },
+        hi: {
+          appName: "🌱 FRUTY ऐप",
+          connectBtn: "🔗 डिवाइस कनेक्ट करें",
+          liveViewTitle: "🤖 फील्ड रोबोट दृश्य",
+          robotLocation: "📍 उत्तर प्लॉट",
+          fieldStatusTitle: "🌾 क्षेत्र की स्थिति",
+          pestsTitle: "🌿 कीट",
+          moistureTitle: "💧 नमी",
+          phTitle: "⚗ पीएच",
+          nutrientsTitle: "🌱 पोषक तत्व",
+          pestsValue: "कोई नहीं",
+          nutrientsValue: "अच्छा",
+          cropSugTitle: "🌾 फसल सुझाव",
+          cropSugText: "अनुशंसित: मक्का, गेहूं, और जौ",
+          chargingTitle: "🔋 फ्रूटी चार्ज स्थिति",
+          chargingStatus: "बैटरी 75% पर, चार्ज हो रही है",
+          actionsTitle: "⚡ क्रियाएं",
+          checkPestsBtn: "🐛 कीट जांचें",
+          removeWeedsBtn: "🌿 खरपतवार हटाएं",
+          testSoilBtn: "🧪 मिट्टी जांचें",
+          irrigateBtn: "🚰 सिंचाई करें",
+          alertsTitle: "🚨 अलर्ट",
+          snakeAlert: "🐍 साँप संपर्कित — उत्तर प्लॉट",
+          weedsAlert: "🌿 अधिक खरपतवार — क्षेत्र बी",
+          suggestionsTitle: "🌱 सुझाव",
+          phAdvice: "मृदा का पीएच 6.4 — पोटाश उर्वरक डालें",
+          footer: "FRUTY किसानों के लिए ऐप • डेमो"
+        },
+        mr: {
+          appName: "🌱 FRUTY ॲप",
+          connectBtn: "🔗 डिव्हाइस जोडा",
+          liveViewTitle: "🤖 क्षेत्रावरील रोबोट",
+          robotLocation: "📍 उत्तर प्लॉट",
+          fieldStatusTitle: "🌾 क्षेत्र स्थिती",
+          pestsTitle: "🌿 किडी",
+          moistureTitle: "💧 ओलावा",
+          phTitle: "⚗ पीएच",
+          nutrientsTitle: "🌱 पोषक तत्व",
+          pestsValue: "नाही",
+          nutrientsValue: "छान",
+          cropSugTitle: "🌾 पीक सूचना",
+          cropSugText: "सुचविलेले पीक: मका, गहू, ज्वारी",
+          chargingTitle: "🔋 फ्रूटी चार्जिंग",
+          chargingStatus: "बॅटरी ७५% वर, चार्जिंग",
+          actionsTitle: "⚡ क्रिया",
+          checkPestsBtn: "🐛 किडी तपासा",
+          removeWeedsBtn: "🌿 त्यांचा काढा",
+          testSoilBtn: "🧪 मातीची चाचणी",
+          irrigateBtn: "🚰 सिंचन करा",
+          alertsTitle: "🚨 सूचना",
+          snakeAlert: "🐍 साप शोधला - उत्तर प्लॉट",
+          weedsAlert: "🌿 अधिक किडी - क्षेत्र बी",
+          suggestionsTitle: "🌱 सूचना",
+          phAdvice: "माती पीएच 6.4 - पोटाश खत द्या",
+          footer: "FRUTY शेतकरी अ‍ॅप • डेमो"
+        },
+        bn: {
+          appName: "🌱 FRUTY অ্যাপ",
+          connectBtn: "🔗 ডিভাইস সংযোজন করুন",
+          liveViewTitle: "🤖 মাঠের রোবটের দৃশ্য",
+          robotLocation: "📍 উত্তর প্লট",
+          fieldStatusTitle: "🌾 মাঠের অবস্থা",
+          pestsTitle: "🌿 পোকার উপস্থিতি",
+          moistureTitle: "💧 আর্দ্রতা",
+          phTitle: "⚗ পিএইচ মাত্রা",
+          nutrientsTitle: "🌱 পুষ্টি",
+          pestsValue: "কোনও নেই",
+          nutrientsValue: "ভালো",
+          cropSugTitle: "🌾 ফসলের প্রস্তাবনা",
+          cropSugText: "প্রস্তাবিত: মকর, গম, বার্লি",
+          chargingTitle: "🔋 ফ্রুটি চার্জিং অবস্থা",
+          chargingStatus: "ব্যাটারি ৭৫% চার্জ, সচল",
+          actionsTitle: "⚡ কর্মসমূহ",
+          checkPestsBtn: "🐛 কলুষতা পরীক্ষা করুন",
+          removeWeedsBtn: "🌿 আগাছা দূর করুন",
+          testSoilBtn: "🧪 মাটি পরীক্ষা করুন",
+          irrigateBtn: "🚰 সেচ দিন",
+          alertsTitle: "🚨 সতর্কতা",
+          snakeAlert: "🐍 সাপ দেখা গেছে - উত্তর প্লট",
+          weedsAlert: "🌿 আগাছা বাড়ছে - ক্ষেত্র বি",
+          suggestionsTitle: "🌱 পরামর্শ",
+          phAdvice: "মাটির পিএইচ 6.4 - পটাশ সার প্রয়োগ করুন",
+          footer: "FRUTY কৃষক অ্যাপ - ডেমো"
+        },
+        te: {
+          appName: "🌱 FRUTY యాప్",
+          connectBtn: "🔗 డివైస్ కనెక్ట్ చేయండి",
+          liveViewTitle: "🤖 ఫీల్డ్ రోబోట్ వీక్షణ",
+          robotLocation: "📍 ఉత్తర ప్లాట్",
+          fieldStatusTitle: "🌾 ఫీల్డ్ స్థితి",
+          pestsTitle: "🌿 తెగుళ్లు",
+          moistureTitle: "💧 తేమ",
+          phTitle: "⚗ పిహెచ్",
+          nutrientsTitle: "🌱 పోషకాలు",
+          pestsValue: "లేవు",
+          nutrientsValue: "మంచిది",
+          cropSugTitle: "🌾 పంట సూచనలు",
+          cropSugText: "సిఫార్సు: మక్కజొన్న, గోధుమ, బార్లీ",
+          chargingTitle: "🔋 ఫ్రూటీ ఛార్జింగ్ స్థితి",
+          chargingStatus: "బ్యాటరీ 75%, ఛార్జవుతోంది",
+          actionsTitle: "⚡ చర్యలు",
+          checkPestsBtn: "🐛 తెగుళ్లు తనిఖీ చేయండి",
+          removeWeedsBtn: "🌿 మల్లెలు తొలగించండి",
+          testSoilBtn: "🧪 నేల తనిఖీ",
+          irrigateBtn: "🚰 సాగు చేయండి",
+          alertsTitle: "🚨 హెచ్చరికలు",
+          snakeAlert: "🐍 పాము గుర్తించబడింది — ఉత్తర ప్లాట్",
+          weedsAlert: "🌿 అధిక మల్లెలు — ఫీల్డ్ B",
+          suggestionsTitle: "🌱 సూచనలు",
+          phAdvice: "మట్టిలో పిహెచ్ 6.4 — పొటాష్ ఎరువును వేసండి",
+          footer: "FRUTY రైతు యాప్ • డెమో"
+},
+      };
+
+      // Update all texts on UI
+      const langSelect = document.getElementById('lang-select');
+      if (langSelect) {
+        langSelect.addEventListener('change', () => {
+          updateTexts(langSelect.value);
+          attachVoiceEvents(langSelect.value);
+        });
+      }
+      function updateTexts(lang) {
+        const texts = translations[lang] || translations['en'];
+        for (const key in texts) {
+          if (key === 'footer') {
+            document.querySelector('footer').textContent = texts[key];
+            continue;
+          }
+          const el = document.getElementById(key);
+          if (el) el.textContent = texts[key];
+        }
+        // Buttons need special handling (checkPestsBtn, removeWeedsBtn, …)
+        ['connectBtn', 'checkPestsBtn', 'removeWeedsBtn', 'testSoilBtn', 'irrigateBtn'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && texts[id]) el.textContent = texts[id];
+        });
+      }
+      function attachVoiceEvents(lang) {
+        const langVoicesMap = {
+          'en': 'en-US',
+          'hi': 'hi-IN',
+          'mr': 'mr-IN',
+          'bn': 'bn-IN',
+          'te': 'te-IN'
+        };
+        let langCode = langVoicesMap[lang] || 'en-US';
+        const elements = ['appName', 'connectBtn', 'liveViewTitle', 'robot-location', 'fieldStatusTitle', 'pestsTitle', 'pestsValue', 'moistureTitle', 'moistureValue', 'phTitle', 'phValue', 'nutrientsTitle', 'nutrientsValue', 'cropSugTitle', 'cropSugText', 'chargingTitle', 'chargingStatus', 'actionsTitle', 'removeWeedsBtn', 'testSoilBtn', 'irrigateBtn', 'alertsTitle', 'snakeAlert', 'weedsAlert', 'phAdvice', 'footer'];
+        elements.forEach(id => {
+          let el = id === 'footer' ? document.querySelector('footer') : document.getElementById(id);
+          if (!el) return;
+          el.tabIndex = 0;
+          el.style.cursor = 'pointer';
+          el.onclick = () => speakText(el.textContent, langCode);
+          el.onkeypress = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              speakText(el.textContent, langCode);
+            }
+          }
+        });
+      }
+      function speakText(text, langCode) {
+        if (!text) return;
+        if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = langCode;
+        // Choose best voice available
+        let voices = window.speechSynthesis.getVoices();
+        let filtered = voices.filter(v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
+        // Priority voices with 'Google', 'Microsoft' etc.
+        let preferred = ['google', 'microsoft', 'neural', 'zira', 'susan'];
+        for (let p of preferred) {
+          for (let v of filtered) {
+            if (v.name.toLowerCase().includes(p)) {
+              utterance.voice = v;
+              break;
+            }
+          }
+          if (utterance.voice) break;
+        }
+        if (!utterance.voice && filtered.length) utterance.voice = filtered[0];
+        window.speechSynthesis.speak(utterance);
+      }
+      window.onload = () => {
+        updateTexts(langSelect.value);
+        attachVoiceEvents(langSelect.value);
+        // Start blinking on weed alert
+        let weedAlert = document.getElementById('weedsAlert');
+        if (weedAlert) weedAlert.classList.add('blink');
+      };
+      document.getElementById("checkPestsBtn").onclick = async function(e) {
+  e.stopPropagation();
+  const response = await fetch('http://localhost:5000/check_pests');
+  const data = await response.json();
+  const pestsEl = document.getElementById('pestsValue');
+  if (pestsEl) pestsEl.textContent = data.pest;
+
+  // Remove old elements if present
+  let imgId = 'detectedPestImage';
+  let oldImg = document.getElementById(imgId);
+  if (oldImg) oldImg.remove();
+  let fertId = 'organicFertilizer';
+  let oldFert = document.getElementById(fertId);
+  if (oldFert) oldFert.remove();
+
+  // Add pest image
+  if (data.image) {
+    let img = document.createElement('img');
+    img.src = data.image;
+    img.alt = "Pest Image";
+    img.id = imgId;
+    img.style = "width:180px;display:block;margin:10px auto 0;";
+    pestsEl.parentNode.appendChild(img);
+  }
+
+  // Add fertilizer suggestion
+  if (data.fertilizer) {
+    let fertDiv = document.createElement('div');
+    fertDiv.id = fertId;
+    fertDiv.style = "margin-top:8px;font-size:15px;text-align:center;";
+    fertDiv.innerHTML = '<strong>Organic Fertilizer Suggest:</strong> <span>' + data.fertilizer + '</span>';
+    pestsEl.parentNode.appendChild(fertDiv);
+  }
+};
+    </script>
+</body>
+
+</html>
